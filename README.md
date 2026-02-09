@@ -238,30 +238,7 @@ Average Score: 4.3/5 (target: >4.0)
 
 ---
 
-##  Demo Flow
 
-### For Judges (5-minute walkthrough)
-
-**1. Problem Setup (30s)**
-- 80% of New Year's resolutions fail
-- Traditional apps focus on tasks, not identity
-
-**2. Solution Demo (2min)**
-- Onboarding → AI generates personalized vision
-- Add journal entry → AI identifies patterns
-- AI suggests reflection prompt → Complete dossier section
-
-**3. Opik Integration (2min)**
-- Show dashboard with live metrics
-- Demonstrate LLM-as-judge evaluation
-- Highlight quality scores and cost efficiency
-
-**4. Impact Story (30s)**
-- Users complete 3x more dossier sections with AI
-- Opik helped improve AI quality by 40%
-- This is personal growth that actually works
-
----
 
 ##  Success Metrics
 
