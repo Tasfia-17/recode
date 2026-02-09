@@ -1,4 +1,4 @@
-# 🚀 Recode Identity - AI-Powered Identity Transformation Platform
+#  Recode Identity - AI-Powered Identity Transformation Platform
 
 [![Hackathon](https://img.shields.io/badge/Hackathon-2026-purple)](https://github.com/Tasfia-17/recode)
 [![Opik](https://img.shields.io/badge/Powered%20by-Opik-blue)](https://www.comet.com/opik)
@@ -8,7 +8,7 @@
 
 ---
 
-## 🎯 Problem Statement
+##  Problem Statement
 
 **80% of New Year's resolutions fail.** Why? Because traditional goal-setting apps focus on tasks and habits (second-order change) without addressing the root cause: **identity**.
 
@@ -16,7 +16,7 @@ People try to change behaviors without changing who they are. Recode Identity fl
 
 ---
 
-## 💡 Our Solution
+##  Our Solution
 
 **Recode Identity** is an AI-powered personal growth platform inspired by Dan Koe's "How to Fix Your Entire Life in 1 Day" philosophy. We use:
 
@@ -26,17 +26,16 @@ People try to change behaviors without changing who they are. Recode Identity fl
 
 ---
 
-## 🏆 Hackathon Tracks
+##  Hackathon Tracks
 
-### 🥇 Best Use of Opik ($5,000)
-We showcase exceptional implementation of evaluation and observability:
+###  Best Use of Opik 
 
 ✅ **Systematic Tracking:** Every AI call traced with full context  
 ✅ **LLM-as-Judge Evaluation:** Automated quality scoring for vision generation and journal analysis  
 ✅ **Real-time Metrics:** Dashboard showing quality scores, response times, success rates, and cost efficiency  
 ✅ **Data-Driven Insights:** Opik helps us measure and improve AI coaching effectiveness  
 
-### 🥇 Personal Growth & Learning ($5,000)
+###  Personal Growth & Learning 
 We help users learn and grow intellectually and emotionally:
 
 ✅ **Identity Transformation:** Focus on becoming, not just doing  
@@ -46,9 +45,9 @@ We help users learn and grow intellectually and emotionally:
 
 ---
 
-## 🔥 Key Features
+##  Key Features
 
-### 1. 🎭 Boss Fight - Vision Generation
+### 1.  Boss Fight - Vision Generation
 AI generates personalized **vision** and **anti-vision** statements:
 - **Vision:** Who you're becoming (inspiring, identity-focused)
 - **Anti-Vision:** Who you'll remain if you don't change (sobering motivation)
@@ -64,7 +63,7 @@ const vision = await generateVision({
 // Opik automatically evaluates: Specificity: 4.5/5, Inspiration: 4.8/5, Identity-Focus: 4.7/5
 ```
 
-### 2. 📔 Journal Analysis
+### 2.  Journal Analysis
 AI analyzes your journal entries to identify:
 - **Recurring themes** (e.g., "You've mentioned 'fear of failure' 5 times")
 - **Emotional trends** (improving, declining, stable)
@@ -73,7 +72,7 @@ AI analyzes your journal entries to identify:
 
 **Opik tracks:** Relevance, depth, and actionability of each analysis
 
-### 3. 🧠 Dossier Coaching
+### 3.  Dossier Coaching
 AI helps you complete your identity dossier by:
 - Suggesting responses based on your journal history
 - Identifying alignment gaps between vision and actions
@@ -81,7 +80,7 @@ AI helps you complete your identity dossier by:
 
 **Opik measures:** Suggestion acceptance rate and dossier completion velocity
 
-### 4. 📊 Opik Dashboard
+### 4.  Opik Dashboard
 Real-time observability showing:
 - **Total AI Calls:** Track usage across all features
 - **Avg Quality Score:** LLM-as-judge evaluation (target: >4.0/5)
@@ -91,7 +90,7 @@ Real-time observability showing:
 
 ---
 
-## 🛠️ Technical Architecture
+##  Technical Architecture
 
 ### Tech Stack
 ```
@@ -130,7 +129,7 @@ User Input → React Component → useGeminiAI Hook → Gemini API
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 ```bash
@@ -171,7 +170,7 @@ http://localhost:5173
 
 ---
 
-## 📊 Opik Integration Details
+##  Opik Integration Details
 
 ### What We Track
 
@@ -215,7 +214,7 @@ Average Score: 4.3/5 (target: >4.0)
 
 ---
 
-## 🎯 How Opik Makes Us Better
+##  How Opik Makes Us Better
 
 ### 1. Quality Assurance
 - Every AI response is automatically evaluated
@@ -239,7 +238,7 @@ Average Score: 4.3/5 (target: >4.0)
 
 ---
 
-## 🎬 Demo Flow
+##  Demo Flow
 
 ### For Judges (5-minute walkthrough)
 
@@ -264,7 +263,7 @@ Average Score: 4.3/5 (target: >4.0)
 
 ---
 
-## 📈 Success Metrics
+##  Success Metrics
 
 ### AI Performance
 - **Quality Score:** 4.5/5 average (LLM-as-judge)
@@ -305,7 +304,7 @@ recode/
 
 ---
 
-## 🎨 Design Philosophy
+##  Design Philosophy
 
 ### Identity-First Approach
 - Focus on **WHO** you're becoming, not **WHAT** you're doing
@@ -324,24 +323,17 @@ recode/
 
 ---
 
-## 🔮 Future Enhancements
+##  Future Enhancements
 
 ### Planned Features
-- **Multi-Agent System:** Specialized AI coaches for different life areas
 - **Community Features:** Share breakthroughs (anonymously)
 - **Mobile App:** iOS/Android with offline journaling
 - **Voice Journaling:** Speak your reflections, AI transcribes and analyzes
 - **Automated Improvement Loop:** Opik Agent Optimizer for prompt tuning
 
-### Opik Roadmap
-- **A/B Testing Framework:** Test prompt variations systematically
-- **Regression Testing:** Ensure new features don't degrade quality
-- **Custom Metrics:** Track breakthrough moments and identity shifts
-- **Experiment Management:** Compare different AI approaches
 
----
 
-## 🤝 Contributing
+##  Contributing
 
 We welcome contributions! Areas of interest:
 - Additional AI features (quest generation, milestone insights)
@@ -351,13 +343,13 @@ We welcome contributions! Areas of interest:
 
 ---
 
-## 📄 License
+##  License
 
 MIT License - feel free to use this project as inspiration for your own AI + Opik integrations!
 
 ---
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - **Dan Koe** - For the identity-first philosophy that inspired this project
 - **Comet/Opik** - For making AI observability accessible and powerful
@@ -365,7 +357,7 @@ MIT License - feel free to use this project as inspiration for your own AI + Opi
 
 ---
 
-## 📞 Contact
+##  Contact
 
 **Team:** Tasfia & Contributors  
 **GitHub:** [github.com/Tasfia-17/recode](https://github.com/Tasfia-17/recode)  
@@ -373,24 +365,8 @@ MIT License - feel free to use this project as inspiration for your own AI + Opi
 
 ---
 
-## 🎯 Why We'll Win
 
-### Personal Growth & Learning Track
-✅ **Functionality:** Fully working app with real AI integration  
-✅ **Real-world relevance:** Solves #1 New Year's goal (self-improvement)  
-✅ **Use of LLMs:** Multi-feature AI coaching with context awareness  
-✅ **Evaluation:** Comprehensive Opik integration with custom metrics  
-✅ **Goal Alignment:** Identity transformation is the ultimate personal growth  
 
-### Best Use of Opik Track
-✅ **Systematic tracking:** All LLM calls traced with full context  
-✅ **Experiment management:** LLM-as-judge evaluation framework  
-✅ **Performance measurement:** Real-time quality and cost metrics  
-✅ **Data-driven improvement:** Measurable quality gains (40% improvement)  
-✅ **Clear presentation:** Custom dashboard showing meaningful insights  
-
-### The Winning Edge
-Most teams add Opik as an afterthought—just logging calls. We use it as a **core quality assurance system** that makes our AI coaching measurably better. That's the difference between "we used Opik" and "we couldn't have built this without Opik."
 
 ---
 
