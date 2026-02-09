@@ -1,6 +1,9 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { GoogleGenAI } from "@google/genai";
+import { useGeminiAI } from './hooks/useGeminiAI';
+import { OpikDashboard } from './components/OpikDashboard';
+import { registerEvaluators } from './services/evaluators';
 import { 
   ArrowRight, 
   Sparkles, 
@@ -462,10 +465,14 @@ const LogsView: React.FC<{
   onUpdate: (entry: JournalEntry) => void;
   onDelete: (id: string) => void;
   onAdd: () => void;
-}> = ({ entries, onUpdate, onDelete, onAdd }) => {
+  onAnalyze?: () => Promise<void>;
+  insights?: any;
+  isAnalyzing?: boolean;
+}> = ({ entries, onUpdate, onDelete, onAdd, onAnalyze, insights, isAnalyzing }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempResponse, setTempResponse] = useState("");
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showInsights, setShowInsights] = useState(false);
 
   if (showAnalytics) {
     return <AnalyticsView entries={entries} onBack={() => setShowAnalytics(false)} />;
@@ -490,13 +497,72 @@ const LogsView: React.FC<{
           <span className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Daily Log</span>
           <h2 className="text-4xl font-black text-[#1A237E] tracking-tight">Journal</h2>
         </div>
-        <button 
-          onClick={() => setShowAnalytics(true)}
-          className="w-14 h-14 rounded-3xl bg-white/40 backdrop-blur-md border border-white/60 flex items-center justify-center text-yellow-500 shadow-sm hover:shadow-lg transition-all active:scale-95 group"
-        >
-          <Calendar size={26} className="group-hover:scale-110 transition-transform" />
-        </button>
+        <div className="flex items-center space-x-3">
+          {onAnalyze && entries.length > 0 && (
+            <button 
+              onClick={() => {
+                onAnalyze();
+                setShowInsights(true);
+              }}
+              disabled={isAnalyzing}
+              className="px-4 py-2 rounded-2xl bg-purple-500 text-white flex items-center space-x-2 shadow-lg hover:shadow-xl transition-all active:scale-95 disabled:opacity-50"
+            >
+              {isAnalyzing ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} />}
+              <span className="text-sm font-bold">AI Insights</span>
+            </button>
+          )}
+          <button 
+            onClick={() => setShowAnalytics(true)}
+            className="w-14 h-14 rounded-3xl bg-white/40 backdrop-blur-md border border-white/60 flex items-center justify-center text-yellow-500 shadow-sm hover:shadow-lg transition-all active:scale-95 group"
+          >
+            <Calendar size={26} className="group-hover:scale-110 transition-transform" />
+          </button>
+        </div>
       </header>
+
+      {showInsights && insights && (
+        <div className="w-full px-4 mb-6">
+          <div className="bg-purple-50 border-2 border-purple-200 rounded-3xl p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-black text-purple-900">AI Pattern Analysis</h3>
+              <button onClick={() => setShowInsights(false)} className="text-purple-400 hover:text-purple-600">
+                <X size={20} />
+              </button>
+            </div>
+            {insights.themes && insights.themes.length > 0 && (
+              <div>
+                <p className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-2">Recurring Themes</p>
+                <div className="flex flex-wrap gap-2">
+                  {insights.themes.map((theme: string, i: number) => (
+                    <span key={i} className="px-3 py-1 bg-purple-200 text-purple-900 rounded-full text-sm font-semibold">
+                      {theme}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {insights.emotionalTrend && (
+              <div>
+                <p className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-2">Emotional Trend</p>
+                <p className="text-purple-900">{insights.emotionalTrend}</p>
+              </div>
+            )}
+            {insights.suggestions && insights.suggestions.length > 0 && (
+              <div>
+                <p className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-2">Reflection Prompts</p>
+                <ul className="space-y-2">
+                  {insights.suggestions.map((suggestion: string, i: number) => (
+                    <li key={i} className="text-purple-900 flex items-start">
+                      <Sparkles size={14} className="mr-2 mt-1 flex-shrink-0 text-purple-500" />
+                      <span>{suggestion}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="w-full space-y-6 px-4">
         {entries.map((entry) => (
@@ -569,13 +635,19 @@ const LogsView: React.FC<{
 // --- MAIN DASHBOARD ---
 
 const Dashboard: React.FC = () => {
+  const { generateVision, generateAntiVision, analyzeJournal } = useGeminiAI();
+  
   const [directive, setDirective] = useState("");
   const [isEditing, setIsEditing] = useState(true);
   const [hasDirective, setHasDirective] = useState(false);
-  const [activeTab, setActiveTab] = useState<'journey' | 'boss-fight' | 'progress' | 'logs' | 'me'>('journey');
+  const [activeTab, setActiveTab] = useState<'journey' | 'boss-fight' | 'progress' | 'logs' | 'me' | 'opik'>('journey');
   const [vision, setVision] = useState("");
   const [antiVision, setAntiVision] = useState("");
   const [isGeneratingInitial, setIsGeneratingInitial] = useState(false);
+  const [isGeneratingVision, setIsGeneratingVision] = useState(false);
+  const [isGeneratingAntiVision, setIsGeneratingAntiVision] = useState(false);
+  const [isAnalyzingJournal, setIsAnalyzingJournal] = useState(false);
+  const [journalInsights, setJournalInsights] = useState<any>(null);
   
   const [quests, setQuests] = useState([
     { title: "Define Core Loop", reward: "+15 Clarity", icon: <Target />, color: "bg-blue-100", completed: false },
@@ -650,6 +722,8 @@ const Dashboard: React.FC = () => {
   ]);
 
   useEffect(() => {
+    // Register Opik evaluators
+    registerEvaluators();
     const now = new Date();
     const dStr = `${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')}/${now.getFullYear()}`;
     
@@ -711,15 +785,73 @@ const Dashboard: React.FC = () => {
   const generateVisions = async (userDirective: string) => {
     setIsGeneratingInitial(true);
     try {
-      const prompt = `Based on this identity directive: "${userDirective}", generate a JSON object with "vision" and "antiVision" paragraphs. Return ONLY JSON.`;
-      const response = await ai.models.generateContent({ model: 'gemini-3-flash-preview', contents: prompt, config: { responseMimeType: "application/json" } });
-      const result = JSON.parse(response.text || "{}");
-      setVision(result.vision || "");
-      setAntiVision(result.antiVision || "");
+      const context = {
+        directive: userDirective,
+        dossierData: dossier.reduce((acc, cat) => {
+          cat.items.forEach(item => {
+            if (item.response) acc[item.prompt] = item.response;
+          });
+          return acc;
+        }, {} as Record<string, string>),
+        journalEntries: journalEntries.map(e => ({ content: e.response, date: e.date }))
+      };
+      
+      const visionText = await generateVision(context);
+      const antiVisionText = await generateAntiVision({ directive: userDirective, currentVision: visionText });
+      
+      setVision(visionText);
+      setAntiVision(antiVisionText);
     } catch (e) {
       console.error("Failed to generate visions:", e);
     } finally {
       setIsGeneratingInitial(false);
+    }
+  };
+
+  const handleGenerateVision = async () => {
+    setIsGeneratingVision(true);
+    try {
+      const context = {
+        directive,
+        dossierData: dossier.reduce((acc, cat) => {
+          cat.items.forEach(item => {
+            if (item.response) acc[item.prompt] = item.response;
+          });
+          return acc;
+        }, {} as Record<string, string>),
+        journalEntries: journalEntries.map(e => ({ content: e.response, date: e.date }))
+      };
+      const visionText = await generateVision(context);
+      setVision(visionText);
+    } catch (e) {
+      console.error("Failed to generate vision:", e);
+    } finally {
+      setIsGeneratingVision(false);
+    }
+  };
+
+  const handleGenerateAntiVision = async () => {
+    setIsGeneratingAntiVision(true);
+    try {
+      const antiVisionText = await generateAntiVision({ directive, currentVision: vision });
+      setAntiVision(antiVisionText);
+    } catch (e) {
+      console.error("Failed to generate anti-vision:", e);
+    } finally {
+      setIsGeneratingAntiVision(false);
+    }
+  };
+
+  const handleAnalyzeJournal = async () => {
+    if (journalEntries.length === 0) return;
+    setIsAnalyzingJournal(true);
+    try {
+      const insights = await analyzeJournal(journalEntries.map(e => ({ content: e.response, date: e.date, prompt: e.prompt })));
+      setJournalInsights(insights);
+    } catch (e) {
+      console.error("Failed to analyze journal:", e);
+    } finally {
+      setIsAnalyzingJournal(false);
     }
   };
 
@@ -817,7 +949,19 @@ const Dashboard: React.FC = () => {
             )}
           </>
         ) : activeTab === 'boss-fight' ? (
-          <div className="px-2 w-full"><BossFightView vision={vision} setVision={setVision} antiVision={antiVision} setAntiVision={setAntiVision} directive={directive} /></div>
+          <div className="px-2 w-full">
+            <BossFightView 
+              vision={vision} 
+              setVision={setVision} 
+              antiVision={antiVision} 
+              setAntiVision={setAntiVision} 
+              directive={directive}
+              onGenerateVision={handleGenerateVision}
+              onGenerateAntiVision={handleGenerateAntiVision}
+              isGeneratingVision={isGeneratingVision}
+              isGeneratingAntiVision={isGeneratingAntiVision}
+            />
+          </div>
         ) : activeTab === 'progress' ? (
           <div className="px-2 w-full"><ProgressView /></div>
         ) : activeTab === 'logs' ? (
@@ -827,7 +971,14 @@ const Dashboard: React.FC = () => {
               onUpdate={handleUpdateJournal} 
               onDelete={handleDeleteJournal} 
               onAdd={handleAddJournal}
+              onAnalyze={handleAnalyzeJournal}
+              insights={journalInsights}
+              isAnalyzing={isAnalyzingJournal}
             />
+          </div>
+        ) : activeTab === 'opik' ? (
+          <div className="px-2 w-full py-10">
+            <OpikDashboard />
           </div>
         ) : (
           <div className="px-2 w-full">
@@ -843,16 +994,10 @@ const Dashboard: React.FC = () => {
       <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around bg-white/40 backdrop-blur-2xl border-t border-white/40 pt-4 pb-8 px-4 h-24">
           <NavItem icon={<Gamepad2 size={24} />} label="Journey" active={activeTab === 'journey'} onClick={() => setActiveTab('journey')} />
           <NavItem icon={<Skull size={24} />} label="Boss Fight" active={activeTab === 'boss-fight'} onClick={() => setActiveTab('boss-fight')} />
-          
-          <div className="relative group -mt-10">
-            <div className="w-16 h-16 bg-[#FF7043] rounded-[24px] flex items-center justify-center rotate-45 group-hover:rotate-90 transition-all duration-500 shadow-2xl cursor-pointer shadow-[#FF7043]/40 border-4 border-white">
-              <Plus size={36} className="-rotate-45 group-hover:-rotate-90 transition-all duration-500 text-white" />
-            </div>
-          </div>
-
           <NavItem icon={<Activity size={24} />} label="Progress" active={activeTab === 'progress'} onClick={() => setActiveTab('progress')} />
           <NavItem icon={<Notebook size={24} />} label="Logs" active={activeTab === 'logs'} onClick={() => setActiveTab('logs')} />
           <NavItem icon={<UserIcon size={24} />} label="Me" active={activeTab === 'me'} onClick={() => setActiveTab('me')} />
+          <NavItem icon={<Eye size={24} />} label="Opik" active={activeTab === 'opik'} onClick={() => setActiveTab('opik')} />
       </nav>
     </ScenicBackground>
   );
@@ -969,34 +1114,22 @@ const BossFightView: React.FC<{
   antiVision: string; 
   setAntiVision: (v: string) => void;
   directive: string;
-}> = ({ vision, setVision, antiVision, setAntiVision, directive }) => {
+  onGenerateVision: () => Promise<void>;
+  onGenerateAntiVision: () => Promise<void>;
+  isGeneratingVision: boolean;
+  isGeneratingAntiVision: boolean;
+}> = ({ vision, setVision, antiVision, setAntiVision, directive, onGenerateVision, onGenerateAntiVision, isGeneratingVision, isGeneratingAntiVision }) => {
   const [isEditingVision, setIsEditingVision] = useState(!vision);
   const [isEditingAntiVision, setIsEditingAntiVision] = useState(!antiVision);
-  const [loadingType, setLoadingType] = useState<'vision' | 'antiVision' | null>(null);
 
-  const generatePartial = async (type: 'vision' | 'antiVision') => {
-    setLoadingType(type);
-    try {
-      const prompt = `Based on this identity directive: "${directive}", generate a ${type === 'vision' ? 'inspiring, vivid 2-sentence vision of success' : 'stark, cautionary 2-sentence consequences of failure'}. 
-      Return ONLY the text, no other formatting.`;
-      
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: prompt
-      });
-      
-      if (type === 'vision') {
-        setVision(response.text || "");
-        setIsEditingVision(false);
-      } else {
-        setAntiVision(response.text || "");
-        setIsEditingAntiVision(false);
-      }
-    } catch (e) {
-      console.error(`Failed to generate ${type}:`, e);
-    } finally {
-      setLoadingType(null);
-    }
+  const handleGenerateVision = async () => {
+    await onGenerateVision();
+    setIsEditingVision(false);
+  };
+
+  const handleGenerateAntiVision = async () => {
+    await onGenerateAntiVision();
+    setIsEditingAntiVision(false);
   };
 
   return (
@@ -1013,8 +1146,8 @@ const BossFightView: React.FC<{
             <div className="flex items-center space-x-2">
               {isEditingVision ? (
                 <>
-                  <button onClick={() => generatePartial('vision')} className="p-2 bg-green-100 text-green-600 rounded-xl hover:bg-green-200 transition-colors">
-                    {loadingType === 'vision' ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
+                  <button onClick={handleGenerateVision} className="p-2 bg-green-100 text-green-600 rounded-xl hover:bg-green-200 transition-colors">
+                    {isGeneratingVision ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
                   </button>
                   <button onClick={() => vision.length > 5 && setIsEditingVision(false)} className="p-2 bg-green-600 text-white rounded-xl shadow-lg shadow-green-500/30">
                     <Save size={16} />
@@ -1046,8 +1179,8 @@ const BossFightView: React.FC<{
             <div className="flex items-center space-x-2">
               {isEditingAntiVision ? (
                 <>
-                  <button onClick={() => generatePartial('antiVision')} className="p-2 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition-colors">
-                    {loadingType === 'antiVision' ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
+                  <button onClick={handleGenerateAntiVision} className="p-2 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition-colors">
+                    {isGeneratingAntiVision ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
                   </button>
                   <button onClick={() => antiVision.length > 5 && setIsEditingAntiVision(false)} className="p-2 bg-red-600 text-white rounded-xl shadow-lg shadow-green-500/30">
                     <Save size={16} />
